@@ -1,22 +1,25 @@
 #include "ofMain.h"
 
 
-#define NUM 100
+#define NUM 1
 
 class ofApp : public ofBaseApp
 {
-    ofSpherePrimitive sphere, lightSphere;
+    ofSpherePrimitive sphere, lightSphere, equireSphere;
     ofShader PBRShader;
     ofEasyCam cam;
     ofTexture albedo, normal, metal, aoTex, roughTex;
+    ofTexture equire;
     
     ofVec3f pos[NUM];
+    ofVec3f lightPos[5];
     
     //--------------------------------------------------------------
     void setup()
     {
-        sphere.set(5.0f, 30.0f);
+        sphere.set(6.0f, 30.0f);
         lightSphere.set(5, 10);
+        equireSphere.set(1000, 20);
         ofDisableArbTex();
         
         PBRShader.load("shaders/pbr");
@@ -26,14 +29,15 @@ class ofApp : public ofBaseApp
         ofLoadImage(metal, "textures/pbr/rusted_iron/metallic.png");
         ofLoadImage(aoTex, "textures/pbr/rusted_iron/ao.png");
         ofLoadImage(roughTex, "textures/pbr/rusted_iron/roughness.png");
+        ofLoadImage(equire, "textures/equire.jpg");
         
         
         glEnable(GL_DEPTH_TEST);
         
         float R = 50;
-        for(int i = 0; i < NUM; i++)
+        for(int i = 0; i < 5; i++)
         {
-            pos[i] = ofVec3f(ofRandom(-R, R), ofRandom(-R, R), ofRandom(-R, R));
+            lightPos[i] = ofVec3f(ofRandom(-R, R), ofRandom(-R, R), ofRandom(-R, R));
         }
     }
     
@@ -53,7 +57,7 @@ class ofApp : public ofBaseApp
         
         cam.begin();
         ofMatrix4x4 viewMatrix = ofGetCurrentViewMatrix();
-        cam.end();
+        
         
         PBRShader.begin();
         PBRShader.setUniformMatrix4f("projection", cam.getProjectionMatrix());
@@ -66,7 +70,10 @@ class ofApp : public ofBaseApp
         PBRShader.setUniformTexture("aoMap", aoTex, 4);
         
         PBRShader.setUniform3f("camPos", cam.getPosition());
-        PBRShader.setUniform3f("lightPos", ofVec3f(10.0f, 10.0f, 10.0f));
+        for(int i = 0; i < 5; i++)
+        {
+            PBRShader.setUniform3f("light["+to_string(i)+"].position", lightPos[i]);
+        }
         PBRShader.setUniform3f("lightColor", ofVec3f(1.0f, 1.0f, 1.0f));
         PBRShader.setUniform1f("exposure", 1.0f);
         
@@ -75,7 +82,7 @@ class ofApp : public ofBaseApp
         {
             ofMatrix4x4 model;
             model.scale(1.0f, 1.0f, 1.0f);
-            model.translate(pos[i]);
+            model.translate(0.0, 0.0, 0.0);
             PBRShader.setUniformMatrix4f("model", model);
             sphere.draw();
         }
@@ -91,9 +98,13 @@ class ofApp : public ofBaseApp
         //        }
         
         
-        
-        
         PBRShader.end();
+        
+        equire.bind();
+        equireSphere.draw();
+        equire.unbind();
+        
+        cam.end();
     }
     
     
