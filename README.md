@@ -1,6 +1,6 @@
 # PBR-Mat
 
-![ss]()
+![ss](https://github.com/yumataesu/PBR-Mat/blob/master/images/s.png)
 
-## Ref:
+## Reference:
 https://learnopengl.com/#!PBR/Theory
