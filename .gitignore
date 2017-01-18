@@ -1,0 +1,7 @@
+bin/PBR-matDebug.app
+PBR-mat.xcodeproj
+addons.make
+config.make
+Makefile
+openFrameworks-Info.plist
+Project.xcconfig
