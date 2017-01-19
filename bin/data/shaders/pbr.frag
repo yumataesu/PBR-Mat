@@ -105,13 +105,13 @@ void main()
     // reflectance equation
     vec3 Lo = vec3(0.0, 0.0, 0.0);
     
-    
-    for(int i = 0; i < 5; i++)
+    float NdotL = 0.0;
+    for(int i = 0; i < 2; i++)
     {
         // calculate per-light radiance
         vec3 L = normalize(light[i].position - WorldPos);
         vec3 H = normalize(V + L);
-        float distance = length(light[i].position - WorldPos) * 0.05;
+        float distance = length(light[i].position - WorldPos) * 0.5;
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = lightColor * attenuation;
         
@@ -136,7 +136,7 @@ void main()
         vec3 brdf = nominator / denominator;
         
         // scale light by NdotL
-        float NdotL = max(dot(N, L), 0.0);
+        NdotL = max(dot(N, L), 0.0);
         
         // add to outgoing radiance Lo
         Lo += (kD * albedo / vec3(PI, PI, PI) + brdf) * radiance * NdotL; // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
@@ -145,7 +145,7 @@ void main()
     
     // ambient lighting (note that the next IBL tutorial will replace
     // this ambient lighting with environment lighting).
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = vec3(0.3) * albedo * ao;
     
     vec3 color = ambient + Lo;
     
@@ -155,7 +155,7 @@ void main()
     color = pow(color, vec3(1.0/2.2));
     
     
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(color,  1.0);
 }
 
 

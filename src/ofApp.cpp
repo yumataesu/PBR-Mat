@@ -8,11 +8,11 @@ class ofApp : public ofBaseApp
     ofSpherePrimitive sphere, lightSphere, equireSphere;
     ofShader PBRShader;
     ofEasyCam cam;
-    ofTexture albedo, normal, metal, aoTex, roughTex;
+    ofTexture albedo, normal, metal, aoTex, roughTex, heightTex;
     ofTexture equire;
     
     ofVec3f pos[NUM];
-    ofVec3f lightPos[5];
+    ofVec3f lightPos[2];
     
     //--------------------------------------------------------------
     void setup()
@@ -24,28 +24,37 @@ class ofApp : public ofBaseApp
         
         PBRShader.load("shaders/pbr");
         
-        ofLoadImage(albedo, "textures/pbr/rusted_iron/albedo.png");
-        ofLoadImage(normal, "textures/pbr/rusted_iron/normal.png");
-        ofLoadImage(metal, "textures/pbr/rusted_iron/metallic.png");
-        ofLoadImage(aoTex, "textures/pbr/rusted_iron/ao.png");
-        ofLoadImage(roughTex, "textures/pbr/rusted_iron/roughness.png");
-        ofLoadImage(equire, "textures/equire.jpg");
+//        ofLoadImage(albedo, "textures/pbr/rusted_iron/albedo.png");
+//        ofLoadImage(normal, "textures/pbr/rusted_iron/normal.png");
+//        ofLoadImage(metal, "textures/pbr/rusted_iron/metallic.png");
+//        ofLoadImage(aoTex, "textures/pbr/rusted_iron/ao.png");
+//        ofLoadImage(roughTex, "textures/pbr/rusted_iron/roughness.png");
+//        ofLoadImage(equire, "textures/equire.jpg");
+        
+            ofLoadImage(albedo, "textures/stone/rock_cliff_stylized_mossy_Diffuse.png");
+            ofLoadImage(normal, "textures/stone/rock_cliff_stylized_mossy_Normal.png");
+            ofLoadImage(metal, "textures/stone/rock_cliff_stylized_mossy_Glossiness.jpg");
+            ofLoadImage(aoTex, "textures/stone/rock_cliff_stylized_mossy_Ambient_Occlusion.jpg");
+            ofLoadImage(roughTex, "textures/stone/rock_cliff_stylized_mossy_Roughness.png");
+            ofLoadImage(heightTex, "textures/stone/rock_cliff_stylized_mossy_Height.jpg");
+            ofLoadImage(equire, "textures/equire.jpg");
         
         
         glEnable(GL_DEPTH_TEST);
         
-        float R = 50;
-        for(int i = 0; i < 5; i++)
-        {
-            lightPos[i] = ofVec3f(ofRandom(-R, R), ofRandom(-R, R), ofRandom(-R, R));
-        }
+        float R = 10;
+//        for(int i = 0; i < 2; i++)
+//        {
+            lightPos[0] = ofVec3f(10, 7, 10);
+            lightPos[1] = ofVec3f(ofRandom(-R, R), ofRandom(-R, R), ofRandom(-R, R));
+//        }
     }
     
     
     //--------------------------------------------------------------
     void update()
     {
-        
+        cam.orbit(ofGetElapsedTimef() * 20, 200, 15);
     }
     
     
@@ -68,14 +77,16 @@ class ofApp : public ofBaseApp
         PBRShader.setUniformTexture("metallicMap", metal, 2);
         PBRShader.setUniformTexture("roughnessMap", roughTex, 3);
         PBRShader.setUniformTexture("aoMap", aoTex, 4);
+        PBRShader.setUniformTexture("heightMap", heightTex, 5);
         
         PBRShader.setUniform3f("camPos", cam.getPosition());
-        for(int i = 0; i < 5; i++)
+        for(int i = 0; i < 2; i++)
         {
             PBRShader.setUniform3f("light["+to_string(i)+"].position", lightPos[i]);
         }
         PBRShader.setUniform3f("lightColor", ofVec3f(1.0f, 1.0f, 1.0f));
         PBRShader.setUniform1f("exposure", 1.0f);
+        PBRShader.setUniform1f("time", ofGetElapsedTimef());
         
         
         for(int i = 0; i < NUM; i++)
@@ -87,15 +98,6 @@ class ofApp : public ofBaseApp
             sphere.draw();
         }
         
-        
-        
-        //        {
-        //            ofMatrix4x4 model;
-        //            model.scale(1.0f, 1.0f, 1.0f);
-        //            model.translate(10.0f, 10.0f, 10.0f);
-        //            PBRShader.setUniformMatrix4f("model", model);
-        //            lightSphere.draw();
-        //        }
         
         
         PBRShader.end();
@@ -128,8 +130,8 @@ int main(){
     
     ofGLFWWindowSettings settings;
     settings.setGLVersion(3, 3);
-    settings.width = 980;
-    settings.height = 520;
+    settings.width = 1280;
+    settings.height = 720;
     settings.resizable = false;
     ofCreateWindow(settings);
     
